@@ -19,7 +19,7 @@
 **ARISE** is an RNA-anchored framework for spatial multi-omics integration. Rather than constructing independent modality-specific graphs, ARISE defines a **shared-edge topology** by intersecting an RNA feature-similarity graph with a spatial-proximity graph, retaining only edges supported by both transcriptional similarity and physical adjacency. Auxiliary modalities (ADT, ATAC, histone modifications) are encoded on this common scaffold, and an **inside-out hierarchical fusion** module integrates them into a unified latent representation.
 
 <p align="center">
-  <img src="figure/model.png" width="850"/>
+  <img src="ARISE/figure/model.png" width="850"/>
   <br>
   <em>Overview of the ARISE framework.</em>
 </p>
