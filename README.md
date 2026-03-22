@@ -40,16 +40,6 @@
 - PyTorch >= 1.12
 - CUDA (recommended)
 
-### Setup
-
-```bash
-git clone https://github.com/XiangxiangWang-code/ARISE.git
-cd ARISE
-conda create -n arise python=3.8
-conda activate arise
-pip install -r requirements.txt
-```
-
 ### Dependencies
 
 ```
@@ -100,26 +90,57 @@ adata_adt = ad.read_h5ad("adt.h5ad")         # shape: (n_spots, n_proteins)
 ---
 
 ## Quick Start
-
 ```python
-from arise import ARISE
+import scanpy as sc
+from process import normalize, Protein, build_dual_graph, preprocess_HLN
+from train import initialize_model, train_model
+import argparse
 
-# Initialize model
-model = ARISE(
-    modalities=["RNA", "ADT"],   # or ["RNA", "ATAC"] / ["RNA", "ATAC", "Protein"]
-    n_neighbors=15,              # k for kNN graph construction
-    latent_dim=64,               # embedding dimension
-    alpha=10.0,                  # spatial regularization weight
+# Load data
+adata_RNA = sc.read_h5ad('./data/HLN/adata_RNA.h5ad')
+adata_ADT = sc.read_h5ad('./data/HLN/adata_ADT.h5ad')
+
+# Preprocess
+RNA_data, ADT_data = preprocess_HLN(adata_RNA, adata_ADT)
+cell_positions = adata_RNA.obsm['spatial']
+
+# Build RNA-anchored shared-edge graph
+graph_data = build_dual_graph(RNA_data, ADT_data, cell_positions, device=device)
+
+# Initialize and train
+args = argparse.Namespace(
+    hidden_dim=512, out_dim=64, num_clusters=10,
+    beta=25, gamma=10, delta=1, dropout=0,
+    lr=1e-3, epochs=350
 )
+model = initialize_model(graph_data, RNA_data.shape[1], ADT_data.shape[1], args)
+model, embeddings, labels = train_model(model, graph_data, args, true_labels)
+```
 
-# Train
-model.fit(adata_rna, adata_adt)
+---
 
-# Get unified embedding
-embedding = model.get_embedding()   # shape: (n_spots, latent_dim)
+## Reproducing Paper Results
 
-# Cluster
-labels = model.cluster(n_clusters=8)
+### RNA + ADT: Human Lymph Node
+```bash
+python run_HLN.py \
+    --hidden_dim 512 \
+    --out_dim 64 \
+    --num_clusters 10 \
+    --beta 25 \
+    --gamma 10 \
+    --delta 1 \
+    --lr 1e-3 \
+    --epochs 350
+```
+
+Data should be placed as:
+```
+data/
+└── HLN/
+    ├── adata_RNA.h5ad
+    ├── adata_ADT.h5ad
+    └── GT_labels.txt
 ```
 
 ---
@@ -175,71 +196,6 @@ python scripts/run_trimodal.py \
 
 ---
 
-## Results
-
-### Bi-modal Benchmarks
-
-| Dataset | Method | ARI | AMI | NMI |
-|---|---|---|---|---|
-| Mouse Brain (RNA+ATAC) | **ARISE** | **0.4064** | **0.4635** | **0.4657** |
-| | SpatialGlue | 0.3213 | 0.3498 | 0.3712 |
-| | STAGATE | 0.3085 | 0.3401 | 0.3623 |
-| | TotalVI | 0.0183 | 0.0341 | 0.0512 |
-| Human Lymph Node (RNA+ADT) | **ARISE** | **0.3427** | **0.4141** | **0.4182** |
-| | SpatialGlue | 0.2981 | 0.3624 | 0.3891 |
-| | PRAGA | 0.3012 | 0.3801 | 0.3914 |
-
-### Tri-modal Benchmarks (SC ↑ / DB ↓)
-
-| Dataset | ARISE | PRAGA | MISO |
-|---|---|---|---|
-| ME (RNA+ATAC+Protein) | **best** | moderate | poor |
-| ME H3K27ac | **best** | unstable | near-collapse |
-| ME H3K4me3 | **best** | unstable | near-collapse |
-| ME H3K27me3 | **best** | unstable | near-collapse |
-
----
-
-## Method
-
-ARISE proceeds in four steps:
-
-**1. Preprocessing**
-- RNA: top 3,000 HVGs, total-count normalization, log1p, centering
-- ADT: centered log-ratio normalization
-- ATAC: TF-IDF normalization + latent semantic indexing
-
-**2. RNA-Anchored Shared-Edge Topology**
-
-$$A_{\text{com}} = A_{\text{feat}} \cap A_{\text{spatial}}$$
-
-Only edges supported by both transcriptional similarity and spatial proximity are retained. This minimizes false-positive edges (Theorems 1–3).
-
-**3. Inside-Out Hierarchical Fusion**
-- Dual RNA embeddings (feature graph + spatial graph) are first consolidated into an anchor representation
-- Auxiliary modality embeddings, encoded on $A_{\text{com}}$, are then progressively incorporated
-
-**4. Training Objective**
-
-$$\mathcal{L}_{\text{total}} = \alpha \mathcal{L}_{\text{spatial}} + \beta \mathcal{L}_{\text{recon}} + \gamma \mathcal{L}_{\text{L1,L2}}$$
-
----
-
-## Citation
-
-If you find ARISE useful in your research, please cite:
-
-```bibtex
-@article{wang2024arise,
-  title     = {ARISE: RNA-Anchored Shared-Edge Topology and Hierarchical Fusion 
-               for Scalable Spatial Multi-Omics Integration},
-  author    = {Wang, Xiangxiang and Su, Yanchi and Hao, Gaoyang and 
-               Wang, Meng and Wang, Yunhe and Li, Xiangtao},
-  journal   = {Journal Title Here},
-  year      = {2024},
-  url       = {https://github.com/XiangxiangWang-code/ARISE}
-}
-```
 
 ---
 
