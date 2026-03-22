@@ -89,113 +89,14 @@ adata_adt = ad.read_h5ad("adt.h5ad")         # shape: (n_spots, n_proteins)
 
 ---
 
-## Quick Start
-```python
-import scanpy as sc
-from process import normalize, Protein, build_dual_graph, preprocess_HLN
-from train import initialize_model, train_model
-import argparse
-
-# Load data
-adata_RNA = sc.read_h5ad('./data/HLN/adata_RNA.h5ad')
-adata_ADT = sc.read_h5ad('./data/HLN/adata_ADT.h5ad')
-
-# Preprocess
-RNA_data, ADT_data = preprocess_HLN(adata_RNA, adata_ADT)
-cell_positions = adata_RNA.obsm['spatial']
-
-# Build RNA-anchored shared-edge graph
-graph_data = build_dual_graph(RNA_data, ADT_data, cell_positions, device=device)
-
-# Initialize and train
-args = argparse.Namespace(
-    hidden_dim=512, out_dim=64, num_clusters=10,
-    beta=25, gamma=10, delta=1, dropout=0,
-    lr=1e-3, epochs=350
-)
-model = initialize_model(graph_data, RNA_data.shape[1], ADT_data.shape[1], args)
-model, embeddings, labels = train_model(model, graph_data, args, true_labels)
-```
-
----
-
 ## Reproducing Paper Results
+
+Training scripts are located in `ARISE/code/`.
 
 ### RNA + ADT: Human Lymph Node
 ```bash
-python run_HLN.py \
-    --hidden_dim 512 \
-    --out_dim 64 \
-    --num_clusters 10 \
-    --beta 25 \
-    --gamma 10 \
-    --delta 1 \
-    --lr 1e-3 \
-    --epochs 350
+python ARISE/code/HLN.py
 ```
-
-Data should be placed as:
-```
-data/
-└── HLN/
-    ├── adata_RNA.h5ad
-    ├── adata_ADT.h5ad
-    └── GT_labels.txt
-```
-
----
-
-## Reproducing Paper Results
-
-### RNA + ADT: Human Lymph Node
-
-```bash
-python scripts/run_hln.py \
-    --rna_path data/HLN/rna.h5ad \
-    --adt_path data/HLN/adt.h5ad \
-    --n_clusters 8 \
-    --n_neighbors 15 \
-    --latent_dim 64 \
-    --alpha 10
-```
-
-### RNA + ATAC: Mouse Brain
-
-```bash
-python scripts/run_mouse_brain.py \
-    --rna_path data/MouseBrain/rna.h5ad \
-    --atac_path data/MouseBrain/atac.h5ad \
-    --n_clusters 14 \
-    --n_neighbors 15 \
-    --latent_dim 64 \
-    --alpha 10
-```
-
-### RNA + ATAC: Embryo E13
-
-```bash
-python scripts/run_e13.py \
-    --rna_path data/E13/rna.h5ad \
-    --atac_path data/E13/atac.h5ad \
-    --n_neighbors 15 \
-    --latent_dim 64 \
-    --alpha 10
-```
-
-### Tri-modal: Mouse Embryo (Spatial-Mux-seq)
-
-```bash
-python scripts/run_trimodal.py \
-    --rna_path data/ME/rna.h5ad \
-    --atac_path data/ME/atac.h5ad \
-    --protein_path data/ME/protein.h5ad \
-    --n_neighbors 15 \
-    --latent_dim 64 \
-    --alpha 10
-```
-
----
-
 
 ---
 
