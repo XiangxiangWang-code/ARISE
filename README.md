@@ -21,7 +21,6 @@
 <p align="center">
   <img src="ARISE/figure/model.png" width="850"/>
   <br>
-  <em>Overview of the ARISE framework.</em>
 </p>
 
 **Key advantages:**
