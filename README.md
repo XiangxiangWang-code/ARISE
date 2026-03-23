@@ -108,5 +108,4 @@ python ARISE/code/HLN.py
 
 For questions or issues, please open a GitHub Issue or contact:
 
-- Yunhe Wang: wangyh082@hebut.edu.cn  
-- Xiangtao Li: lixt314@jlu.edu.cn
+- Xiangxiang Wang: 2319659260@qq.com
