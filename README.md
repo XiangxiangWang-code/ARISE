@@ -56,6 +56,8 @@ seaborn
 ## Setup
 ```bash
 git clone https://github.com/XiangxiangWang-code/ARISE.git
+cd ARISE
+pip install -r requirements.txt
 ```
 ---
 
