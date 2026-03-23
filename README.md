@@ -54,7 +54,10 @@ scikit-learn
 matplotlib
 seaborn
 ```
-
+## Setup
+```bash
+git clone https://github.com/XiangxiangWang-code/ARISE.git
+```
 ---
 
 ## Data Preparation
