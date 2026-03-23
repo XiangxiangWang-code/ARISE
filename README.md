@@ -65,16 +65,6 @@ pip install -r requirements.txt
 
 ARISE accepts input in [AnnData](https://anndata.readthedocs.io/) `.h5ad` format. Each modality should be stored as a separate AnnData object with spatial coordinates in `adata.obsm['spatial']`.
 
-### Datasets Used in the Paper
-
-| Dataset | Modalities | Spots | Source |
-|---|---|---|---|
-| Human Lymph Node (HLN) | RNA + ADT | 3,484 | [Long et al., 2024](https://www.nature.com/articles/s41592-024-02313-7) |
-| Mouse Brain (P22) | RNA + ATAC | 9,215 | [Zhang et al., 2023](https://www.nature.com/articles/s41586-023-05795-1) |
-| Mouse Thymus | RNA + ADT | 4,697 | [Liao et al., 2023](https://www.biorxiv.org/content/10.1101/2023.04.26.538404) |
-| Mouse Embryo E13 | RNA + ATAC | 2,187 | [Zhang et al., 2023](https://www.nature.com/articles/s41586-023-05795-1) |
-| Mouse Embryo (Spatial-Mux-seq) | RNA + ATAC + Protein | 10,000 | [Guo et al., 2024](https://doi.org/10.1101/2024.09.19.39345645) |
-| Mouse Embryo (H3K27ac/H3K4me3/H3K27me3) | RNA + Histone | ~2,500–10,000 | [Guo et al., 2024](https://doi.org/10.1101/2024.09.19.39345645) |
 
 ### Data Format
 
