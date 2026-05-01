@@ -134,7 +134,7 @@ class DualSDMCC(nn.Module):
         l_reconstruction_dist = F.mse_loss(x_RNA, self.gcn.reconstruct(dist_z))
         l_reconstruction_adt = F.mse_loss(x_ADT, self.gcn.reconstruct2(pro))
 
-        l_spatial_reg = self.spatial_regularization_loss(fused_z, data.sim_edge_index, data.sim_edge_weight)
+        l_spatial_reg = self.spatial_regularization_loss(fused_z, data.dist_edge_index, data.dist_edge_weight)
 
         reg_loss = self.compute_regularization_loss()
 
